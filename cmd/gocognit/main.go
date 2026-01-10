@@ -64,7 +64,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/uudashr/gocognit"
+	"github.com/gsixo/gocognit"
 )
 
 const usageDoc = `Calculate cognitive complexities of Go functions.
