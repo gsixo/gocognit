@@ -1,6 +1,10 @@
 package sonar
 
-import "go/ast"
+import (
+	"go/ast"
+
+	"github.com/gsixo/gocognit/visitor"
+)
 
 type CallVisitor struct {
 	parent ast.Visitor
@@ -31,5 +35,18 @@ func (v *CallVisitor) getFunIdentificator() *ast.Ident {
 	if v.nodeFunIsIdentificator() {
 		return v.node.Fun.(*ast.Ident)
 	}
+	return nil
+}
+
+type CallVisitorWithCounters struct {
+	visitor  visitor.CallExpressionVisitor
+	counters visitor.VisitorCounters
+}
+
+func (v *CallVisitorWithCounters) Visit() (w ast.Visitor) {
+	if v.visitor.DetectRecursion() {
+		v.counters.IncComplexityCounterWithDelta(1)
+	}
+
 	return nil
 }

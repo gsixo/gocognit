@@ -1,6 +1,10 @@
 package sonar
 
-import "go/ast"
+import (
+	"go/ast"
+
+	"github.com/gsixo/gocognit/visitor"
+)
 
 type RangeVisitor struct {
 	parent ast.Visitor
@@ -43,4 +47,22 @@ func (v *RangeVisitor) VisitX() {
 
 func (v *RangeVisitor) VisitBody() {
 	v.walk(v.node.Body)
+}
+
+type RangeVisitorWithCounters struct {
+	visitor  visitor.RangeVisitor
+	counters visitor.VisitorCounters
+}
+
+func (v *RangeVisitorWithCounters) Visit() (w ast.Visitor) {
+	v.counters.IncComplexityCounterWithPlusNestingCounterValue(1)
+	v.visitor.VisitKey()
+	v.visitor.VisitValue()
+	v.visitor.VisitX()
+
+	v.counters.IncDecNestingCounterWithFnBetween(
+		v.visitor.VisitBody,
+	)
+
+	return nil
 }

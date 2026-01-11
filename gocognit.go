@@ -164,12 +164,12 @@ func Complexity(fn *ast.FuncDecl) int {
 
 // ScanComplexity scans the function declaration.
 func ScanComplexity(fn *ast.FuncDecl, includeDiagnostics bool) ScanResult {
-	v := sonar.SonarVisitor{}
-	ast.Walk(&v, fn)
+	v := sonar.NewSonarVisitor()
+	ast.Walk(v, fn)
 
 	return ScanResult{
-		Diagnostics: v.diagnostics,
-		Complexity:  v.,
+		// Diagnostics: v.diagnostics,
+		Complexity: int(v.GetComplexity()),
 	}
 }
 

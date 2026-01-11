@@ -1,6 +1,10 @@
 package sonar
 
-import "go/ast"
+import (
+	"go/ast"
+
+	"github.com/gsixo/gocognit/visitor"
+)
 
 type SwitchVisitor struct {
 	parent ast.Visitor
@@ -39,4 +43,21 @@ func (v *SwitchVisitor) nodeHasTag() bool {
 
 func (v *SwitchVisitor) VisitBody() {
 	v.walk(v.node.Body)
+}
+
+type SwitchVisitorWithCounters struct {
+	visitor  visitor.SwitchVisitor
+	counters visitor.VisitorCounters
+}
+
+func (v *SwitchVisitorWithCounters) Visit() (w ast.Visitor) {
+	v.counters.IncComplexityCounterWithPlusNestingCounterValue(1)
+	v.visitor.VisitInitCondition()
+	v.visitor.VisitTag()
+
+	v.counters.IncDecNestingCounterWithFnBetween(
+		v.visitor.VisitBody,
+	)
+
+	return nil
 }

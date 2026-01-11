@@ -8,6 +8,10 @@ import (
 
 type SonarVisitorsGetter struct{}
 
+func NewSonarVisitorsGetter() visitor.VisitorsGetter {
+	return &SonarVisitorsGetter{}
+}
+
 func (g *SonarVisitorsGetter) GetIfVisitor(parent ast.Visitor, node *ast.IfStmt) visitor.IfVisitor {
 	return &IfVisitor{parent: parent, node: node}
 }
@@ -46,4 +50,96 @@ func (g *SonarVisitorsGetter) GetBinaryExpressionVisitor(parent ast.Visitor, nod
 
 func (g *SonarVisitorsGetter) GetCallExpressionVisitor(parent ast.Visitor, node *ast.CallExpr) visitor.CallExpressionVisitor {
 	return &CallVisitor{parent: parent, node: node}
+}
+
+type SonarVisitorsWithCountersGetter struct {
+	visitorsGetter visitor.VisitorsGetter
+	counters       visitor.VisitorCounters
+}
+
+func NewSonarVisitorsWithCountersGetter() visitor.VisitorsWithCountersGetter {
+	return &SonarVisitorsWithCountersGetter{
+		visitorsGetter: NewSonarVisitorsGetter(),
+		counters:       NewVisitorCounters(),
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetIfVisitorWithCounters(parent ast.Visitor, node *ast.IfStmt) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetIfVisitor(parent, node)
+	return &IfVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetSwitchVisitorWithCounters(parent ast.Visitor, node *ast.SwitchStmt) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetSwitchVisitor(parent, node)
+	return &SwitchVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetTypeSwitchVisitorWithCounters(parent ast.Visitor, node *ast.TypeSwitchStmt) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetTypeSwitchVisitor(parent, node)
+	return &TypeSwitchVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetSelectVisitorWithCounters(parent ast.Visitor, node *ast.SelectStmt) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetSelectVisitor(parent, node)
+	return &SelectVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetForVisitorWithCounters(parent ast.Visitor, node *ast.ForStmt) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetForVisitor(parent, node)
+	return &ForVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetRangeVisitorWithCounters(parent ast.Visitor, node *ast.RangeStmt) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetRangeVisitor(parent, node)
+	return &RangeVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetFuncLiteralVisitorWithCounters(parent ast.Visitor, node *ast.FuncLit) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetFuncLiteralVisitor(parent, node)
+	return &FuncLiteralVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetBranchStatementVisitorWithCounters(parent ast.Visitor, node *ast.BranchStmt) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetBranchStatementVisitor(parent, node)
+	return &BranchVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetBinaryExpressionVisitorWithCounters(parent ast.Visitor, node *ast.BinaryExpr) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetBinaryExpressionVisitor(parent, node)
+	return &BinaryVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
+}
+
+func (g *SonarVisitorsWithCountersGetter) GetCallExpressionVisitorWithCounters(parent ast.Visitor, node *ast.CallExpr) visitor.VisitorWithCounters {
+	visitor := g.visitorsGetter.GetCallExpressionVisitor(parent, node)
+	return &BinaryVisitorWithCounters{
+		visitor:  visitor,
+		counters: g.counters,
+	}
 }

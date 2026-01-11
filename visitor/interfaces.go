@@ -2,6 +2,11 @@ package visitor
 
 import "go/ast"
 
+type Visitor interface {
+	Visit(node ast.Node) ast.Visitor
+	GetComplexity() uint64
+}
+
 type VisitorsGetter interface {
 	GetIfVisitor(parent ast.Visitor, node *ast.IfStmt) IfVisitor
 	GetSwitchVisitor(parent ast.Visitor, node *ast.SwitchStmt) SwitchVisitor
@@ -15,6 +20,23 @@ type VisitorsGetter interface {
 	GetCallExpressionVisitor(parent ast.Visitor, node *ast.CallExpr) CallExpressionVisitor
 }
 
+type VisitorsWithCountersGetter interface {
+	GetIfVisitorWithCounters(parent ast.Visitor, node *ast.IfStmt) VisitorWithCounters
+	GetSwitchVisitorWithCounters(parent ast.Visitor, node *ast.SwitchStmt) VisitorWithCounters
+	GetTypeSwitchVisitorWithCounters(parent ast.Visitor, node *ast.TypeSwitchStmt) VisitorWithCounters
+	GetSelectVisitorWithCounters(parent ast.Visitor, node *ast.SelectStmt) VisitorWithCounters
+	GetForVisitorWithCounters(parent ast.Visitor, node *ast.ForStmt) VisitorWithCounters
+	GetRangeVisitorWithCounters(parent ast.Visitor, node *ast.RangeStmt) VisitorWithCounters
+	GetFuncLiteralVisitorWithCounters(parent ast.Visitor, node *ast.FuncLit) VisitorWithCounters
+	GetBranchStatementVisitorWithCounters(parent ast.Visitor, node *ast.BranchStmt) VisitorWithCounters
+	GetBinaryExpressionVisitorWithCounters(parent ast.Visitor, node *ast.BinaryExpr) VisitorWithCounters
+	GetCallExpressionVisitorWithCounters(parent ast.Visitor, node *ast.CallExpr) VisitorWithCounters
+}
+
+type VisitorWithCounters interface {
+	Visit() (w ast.Visitor)
+}
+
 type IfVisitor interface {
 	VisitInitCondition()
 	VisitCondition()
@@ -25,13 +47,15 @@ type IfVisitor interface {
 	ElseNodeIsBlockStatement() bool
 }
 
-type VisitorWithCounters interface {
+type VisitorCounters interface {
 	IncComplexityCounterWithDelta(delta uint64)
 	DecComplexityCounter()
 	LoadComplexityCounter() uint64
+	IncComplexityCounterWithPlusNestingCounterValue(delta uint64)
 	IncNestingCounterWithDelta(delta uint64)
 	DecNestingCounter()
 	LoadNestingCounter() uint64
+	IncDecNestingCounterWithFnBetween(fn func())
 }
 
 type SwitchVisitor interface {

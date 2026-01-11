@@ -85,24 +85,28 @@ func (v *IfVisitor) ElseNodeIsBlockStatement() bool {
 }
 
 type IfVisitorWithCounters struct {
-	visitor  IfVisitor
-	counters visitor.VisitorWithCounters
+	visitor  visitor.IfVisitor
+	counters visitor.VisitorCounters
 }
 
-func (v *IfVisitorWithCounters) Visit(node ast.Node) (w ast.Visitor) {
+func (v *IfVisitorWithCounters) Visit() (w ast.Visitor) {
 	if v.visitor.IsElseNode() {
 		v.counters.IncComplexityCounterWithDelta(1)
 	} else {
-		w.incComplexityWithNesting()
+		v.counters.IncComplexityCounterWithPlusNestingCounterValue(1)
 	}
 
-	v.VisitInitCondition()
-	v.VisitCondition()
-	w.wrapWithNesting(v.VisitBody)
-	v.VisitElseBlockStatement()
-	if v.ElseNodeIsBlockStatement() {
-		w.incComplexity(1)
+	v.visitor.VisitInitCondition()
+	v.visitor.VisitCondition()
+	v.counters.IncDecNestingCounterWithFnBetween(
+		v.visitor.VisitBody,
+	)
+	v.visitor.VisitElseBlockStatement()
+	if v.visitor.ElseNodeIsBlockStatement() {
+		v.counters.IncComplexityCounterWithDelta(1)
 	} else {
-		v.VisitElseIfStatement()
+		v.visitor.VisitElseIfStatement()
 	}
+
+	return nil
 }
